@@ -42,6 +42,16 @@ spec:
       elif [[ "${CI_MERGE_REQUEST_EVENT_TYPE}" == "merge_train" ]]; then
           __branch="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
           __branch_source="merge_train"
+      elif [[ -n "${CI_COMMIT_TAG}" ]]; then
+          __version="${CI_COMMIT_TAG#v}"
+          __version="${__version%%-*}"
+          __version_patch="${__version##*.}"
+
+          __branch="release/v${__version}"
+          if [[ "${__version_patch}" != "0" ]]; then
+            __branch="hotfix/v${__version}"
+          fi
+          __branch_source="normal"
       else
           __branch="${CI_COMMIT_REF_NAME}"
           __branch_source="normal"

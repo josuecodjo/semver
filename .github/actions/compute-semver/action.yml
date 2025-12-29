@@ -68,6 +68,16 @@ runs:
              # Merge group (e.g., GitHub merge queue) uses GITHUB_REF
             __branch="$(echo "${GITHUB_REF}" | awk -F'/' '{ if (NF > 5) { print $4"/"$5 } else { print $4 } }')"
             __branch_source="merge_group"
+        elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            __version="${GITHUB_REF_NAME#v}"
+            __version="${__version%%-*}"
+            __version_patch="${__version##*.}"
+
+            __branch="release/v${__version}"
+            if [[ "${__version_patch}" != "0" ]]; then
+              __branch="hotfix/v${__version}"
+            fi
+            __branch_source="normal"
         else
             __branch="${GITHUB_REF_NAME}"
             __branch_source="normal"
